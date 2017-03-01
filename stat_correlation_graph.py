@@ -3,16 +3,35 @@ from scipy import stats
 from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.plotting import figure, show
 
+def legal_player_type_values():
+    return ["Batting", "Pitching"]
+
+def legal_batting_position_values():
+    return ["ALL", "C", "1B", "2B", "SS", "3B", "OF"]
+
+def legal_pitching_position_values():
+    return ["SP", "RP"]
+
+def get_input(prompt,valid_args):
+    while True:
+        try:
+            value = raw_input(prompt)
+        except ValueError:
+            print("Can't handle that kind of input, try again.")
+            continue
+        if value not in valid_args:
+            print("Invalid input, try again.")
+            continue
+        else:
+            break
+    return value
+
 year_entry = '2016'
 
-player_type = raw_input("Batting or Pitching?: ")
+player_type = get_input("Batting or Pitching?: ", legal_player_type_values())
 
 if player_type == 'Pitching':
-    position_entry = raw_input("Position (ALL SP RP): ")
-else:
-    position_entry = raw_input("Position (ALL C 1B 2B SS 3B OF): ")
-
-if player_type == 'Pitching':
+    position_entry = get_input("Position (ALL SP RP): ", legal_pitching_position_values())
     advanced = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
     standard = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Standard_' + year_entry + '.csv')
 
@@ -25,6 +44,7 @@ if player_type == 'Pitching':
 
     print("Category Options: W L ERA CG ShO SV HLD BS IP R ER HR H BB SO K/9 BB/9 K/BB HR/9 AVG WHIP BABIP FIP E-F SIERA")
 else:
+    position_entry = get_input("Position (ALL C 1B 2B SS 3B OF): ", legal_batting_position_values())
     advanced = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
     standard = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Standard_' + year_entry + '.csv')
 
