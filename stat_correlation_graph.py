@@ -12,6 +12,12 @@ def legal_batting_position_values():
 def legal_pitching_position_values():
     return ["SP", "RP"]
 
+def batting_category_options():
+    return ["H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
+
+def pitching_category_options():
+    return ["W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
+
 def get_input(prompt,valid_args):
     while True:
         try:
@@ -26,12 +32,38 @@ def get_input(prompt,valid_args):
             break
     return value
 
+def plot_stats(player_data, x_value, y_value):
+    source = ColumnDataSource(
+        data=dict(
+            name=player_data.index,
+            cat1=[player_data[x_value][i] for i in player_data.index],
+            cat2=[player_data[y_value][i] for i in player_data.index],
+        )
+    )
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(player_data[x_value],player_data[y_value])
+    line = slope*player_data[x_value]+intercept
+
+    print(r_value)
+
+    hover = HoverTool(tooltips=[("name", "@name"),(x_value, "@cat1"),(y_value, "@cat2")])
+
+    p = figure(title="Fantasy Baseball", tools=[hover])
+    p.plot_width = 1200
+    p.xaxis.axis_label = x_value
+    p.yaxis.axis_label = y_value
+
+    p.circle('cat1', 'cat2', size=10, color="#4DDB94", source=source, fill_alpha=0.2)
+    p.line(player_data[x_value], line, line_width=2)
+
+    show(p)
+
 year_entry = '2016'
 
 player_type = get_input("Batting or Pitching?: ", legal_player_type_values())
 
 if player_type == 'Pitching':
-    position_entry = get_input("Position (ALL SP RP): ", legal_pitching_position_values())
+    position_entry = get_input("Position (" + " ".join(legal_pitching_position_values()) + "): ", legal_pitching_position_values())
     advanced = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
     standard = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Standard_' + year_entry + '.csv')
 
@@ -42,9 +74,12 @@ if player_type == 'Pitching':
     master = master[["Name","Team","K/9","BB/9","K/BB","HR/9","AVG","WHIP","BABIP","FIP","E-F","SIERA","W","L","ERA","CG","ShO","SV","HLD","BS","IP","R","ER","HR","H","BB","SO"]]
     master = master.set_index(['Name'])
 
-    print("Category Options: W L ERA CG ShO SV HLD BS IP R ER HR H BB SO K/9 BB/9 K/BB HR/9 AVG WHIP BABIP FIP E-F SIERA")
+    print("Category Options (" + " ".join(pitching_category_options()) + "):")
+    cat1_entry = get_input("First Category: ", pitching_category_options())
+    cat2_entry = get_input("Second Category: ", pitching_category_options())
 else:
-    position_entry = get_input("Position (ALL C 1B 2B SS 3B OF): ", legal_batting_position_values())
+
+    position_entry = get_input("Position (" + " ".join(legal_batting_position_values()) + "): ", legal_batting_position_values())
     advanced = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
     standard = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Standard_' + year_entry + '.csv')
 
@@ -55,38 +90,8 @@ else:
     master = master[["Name","Team", "H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA","BB/K","AVG","OBP","SLG","OPS","ISO","Spd","BABIP","UBR","wGDP","wSB","wRC","wRAA","wOBA","wRC+"]]
     master = master.set_index(['Name'])
 
-    print("Category Options: H HR R RBI BB SO SB CS PA BB/K AVG OBP SLG OPS ISO Spd BABIP UBR wGDP wSB wRC wRAA wOBA wRC+")
+    print("Category Options (" + " ".join(batting_category_options()) + "):")
+    cat1_entry = get_input("First Category: ", batting_category_options())
+    cat2_entry = get_input("Second Category: ", batting_category_options())
 
-cat1_entry = raw_input("First Category: ")
-cat2_entry = raw_input("Second Category: ")
-
-cat1_array = master[cat1_entry]
-cat2_array = master[cat2_entry]
-
-source = ColumnDataSource(
-    data=dict(
-        name=master.index,
-        cat1=[cat1_array[i] for i in master.index],
-        cat2=[cat2_array[i] for i in master.index],
-    )
-)
-
-def plot_stats():
-    slope, intercept, r_value, p_value, std_err = stats.linregress(cat1_array,cat2_array)
-    line = slope*cat1_array+intercept
-
-    print(r_value)
-
-    hover = HoverTool(tooltips=[("name", "@name"),(cat1_entry, "@cat1"),(cat2_entry, "@cat2")])
-
-    p = figure(title="Fantasy Baseball", tools=[hover])
-    p.plot_width = 1200
-    p.xaxis.axis_label = cat1_entry
-    p.yaxis.axis_label = cat2_entry
-
-    p.circle('cat1', 'cat2', size=10, color="#4DDB94", source=source, fill_alpha=0.2)
-    p.line(cat1_array, line, line_width=2)
-
-    show(p)
-
-plot_stats()
+plot_stats(master,cat1_entry,cat2_entry)
