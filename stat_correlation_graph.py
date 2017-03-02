@@ -12,8 +12,26 @@ def legal_batting_position_values():
 def legal_pitching_position_values():
     return ["SP", "RP"]
 
+def batting_advanced_values():
+    return ["Name", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
+
+def batting_standard_values():
+    return ["Name", "H", "HR", "R", "RBI", "BB", "SO", "SB", "CS"]
+
+def batting_master_values():
+    return ["Name", "H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
+
 def batting_category_options():
     return ["H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
+
+def pitching_advanced_values():
+    return ["Name", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
+
+def pitching_standard_values():
+    return ["Name", "W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO"]
+
+def pitching_master_values():
+    return ["Name", "W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
 
 def pitching_category_options():
     return ["W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
@@ -64,14 +82,14 @@ player_type = get_input("Batting or Pitching?: ", legal_player_type_values())
 
 if player_type == 'Pitching':
     position_entry = get_input("Position (" + " ".join(legal_pitching_position_values()) + "): ", legal_pitching_position_values())
-    advanced = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
-    standard = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Standard_' + year_entry + '.csv')
+    advanced = pd.read_csv('Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
+    standard = pd.read_csv('Data/' + position_entry + '_Standard_' + year_entry + '.csv')
 
-    advanced = advanced[["Name","Team","K/9","BB/9","K/BB","HR/9","AVG","WHIP","BABIP","FIP","E-F","SIERA"]]
-    standard = standard[["Name","W","L","ERA","CG","ShO","SV","HLD","BS","IP","R","ER","HR","H","BB","SO"]]
+    advanced = advanced[pitching_advanced_values()]
+    standard = standard[pitching_standard_values()]
  
     master = pd.merge(advanced, standard, how='outer', on=['Name'])
-    master = master[["Name","Team","K/9","BB/9","K/BB","HR/9","AVG","WHIP","BABIP","FIP","E-F","SIERA","W","L","ERA","CG","ShO","SV","HLD","BS","IP","R","ER","HR","H","BB","SO"]]
+    master = master[pitching_master_values()]
     master = master.set_index(['Name'])
 
     print("Category Options (" + " ".join(pitching_category_options()) + "):")
@@ -80,14 +98,14 @@ if player_type == 'Pitching':
 else:
 
     position_entry = get_input("Position (" + " ".join(legal_batting_position_values()) + "): ", legal_batting_position_values())
-    advanced = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
-    standard = pd.read_csv('/Users/nschmidt/workspace/baseball/Data/' + position_entry + '_Standard_' + year_entry + '.csv')
+    advanced = pd.read_csv('Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
+    standard = pd.read_csv('Data/' + position_entry + '_Standard_' + year_entry + '.csv')
 
-    advanced = advanced[["Name","Team","PA","BB/K","AVG","OBP","SLG","OPS","ISO","Spd","BABIP","UBR","wGDP","wSB","wRC","wRAA","wOBA","wRC+"]]
-    standard = standard[["Name", "H", "BB", "HR", "R", "RBI", "SO", "SB", "CS"]]
+    advanced = advanced[batting_advanced_values()]
+    standard = standard[batting_standard_values()]
 
     master = pd.merge(advanced, standard, how='outer', on=['Name'])
-    master = master[["Name","Team", "H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA","BB/K","AVG","OBP","SLG","OPS","ISO","Spd","BABIP","UBR","wGDP","wSB","wRC","wRAA","wOBA","wRC+"]]
+    master = master[batting_master_values()]
     master = master.set_index(['Name'])
 
     print("Category Options (" + " ".join(batting_category_options()) + "):")
