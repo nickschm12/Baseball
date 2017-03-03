@@ -3,38 +3,17 @@ from scipy import stats
 from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.plotting import figure, show
 
-def legal_player_type_values():
-    return ["Batting", "Pitching"]
-
-def legal_batting_position_values():
-    return ["ALL", "C", "1B", "2B", "SS", "3B", "OF"]
-
-def legal_pitching_position_values():
-    return ["SP", "RP"]
-
-def batting_advanced_values():
-    return ["Name", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
-
-def batting_standard_values():
-    return ["Name", "H", "HR", "R", "RBI", "BB", "SO", "SB", "CS"]
-
-def batting_master_values():
-    return ["Name", "H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
-
-def batting_category_options():
-    return ["H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
-
-def pitching_advanced_values():
-    return ["Name", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
-
-def pitching_standard_values():
-    return ["Name", "W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO"]
-
-def pitching_master_values():
-    return ["Name", "W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
-
-def pitching_category_options():
-    return ["W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
+LEGAL_PLAYER_TYPE_VALUES = ["Batting", "Pitching"]
+LEGAL_BATTING_POSITION_VALUES = ["ALL", "C", "1B", "2B", "SS", "3B", "OF"]
+LEGAL_PITCHING_POSITION_VALUES = ["SP", "RP"]
+BATTING_ADVANCED_VALUES = ["Name", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
+BATTING_STANDARD_VALUES = ["Name", "H", "HR", "R", "RBI", "BB", "SO", "SB", "CS"]
+BATTING_MASTER_VALUES = ["Name", "H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
+BATTING_CATEGORY_OPTIONS = ["H", "HR", "R", "RBI", "BB", "SO", "SB", "CS", "PA", "BB/K", "AVG", "OBP", "SLG", "OPS", "ISO", "Spd", "BABIP", "UBR", "wGDP", "wSB", "wRC", "wRAA", "wOBA", "wRC+"]
+PITCHING_ADVANCED_VALUES = ["Name", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
+PITCHING_STANDARD_VALUES = ["Name", "W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO"]
+PITCHING_MASTER_VALUES = ["Name", "W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
+PITCHING_CATEGORY_OPTIONS = ["W", "L", "ERA", "CG", "ShO", "SV", "HLD", "BS", "IP", "R", "ER", "HR", "H", "BB", "SO", "K/9", "BB/9", "K/BB", "HR/9", "AVG", "WHIP", "BABIP", "FIP", "E-F", "SIERA"]
 
 def get_input(prompt,valid_args):
     while True:
@@ -78,38 +57,38 @@ def plot_stats(player_data, x_value, y_value):
 
 year_entry = '2016'
 
-player_type = get_input("Batting or Pitching?: ", legal_player_type_values())
+player_type = get_input("Batting or Pitching?: ", LEGAL_PLAYER_TYPE_VALUES)
 
 if player_type == 'Pitching':
-    position_entry = get_input("Position (" + " ".join(legal_pitching_position_values()) + "): ", legal_pitching_position_values())
+    position_entry = get_input("Position (" + " ".join(LEGAL_PITCHING_POSITION_VALUES) + "): ", LEGAL_PITCHING_POSITION_VALUES)
     advanced = pd.read_csv('Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
     standard = pd.read_csv('Data/' + position_entry + '_Standard_' + year_entry + '.csv')
 
-    advanced = advanced[pitching_advanced_values()]
-    standard = standard[pitching_standard_values()]
+    advanced = advanced[PITCHING_ADVANCED_VALUES]
+    standard = standard[PITCHING_STANDARD_VALUES]
  
     master = pd.merge(advanced, standard, how='outer', on=['Name'])
-    master = master[pitching_master_values()]
+    master = master[PITCHING_MASTER_VALUES]
     master = master.set_index(['Name'])
 
-    print("Category Options (" + " ".join(pitching_category_options()) + "):")
-    cat1_entry = get_input("First Category: ", pitching_category_options())
-    cat2_entry = get_input("Second Category: ", pitching_category_options())
+    print("Category Options (" + " ".join(PITCHING_CATEGORY_OPTIONS) + "):")
+    cat1_entry = get_input("First Category: ", PITCHING_CATEGORY_OPTIONS)
+    cat2_entry = get_input("Second Category: ", PITCHING_CATEGORY_OPTIONS)
 else:
 
-    position_entry = get_input("Position (" + " ".join(legal_batting_position_values()) + "): ", legal_batting_position_values())
+    position_entry = get_input("Position (" + " ".join(LEGAL_BATTING_POSITION_VALUES) + "): ", LEGAL_BATTING_POSITION_VALUES)
     advanced = pd.read_csv('Data/' + position_entry + '_Advanced_' + year_entry + '.csv')
     standard = pd.read_csv('Data/' + position_entry + '_Standard_' + year_entry + '.csv')
 
-    advanced = advanced[batting_advanced_values()]
-    standard = standard[batting_standard_values()]
+    advanced = advanced[BATTING_ADVANCED_VALUES]
+    standard = standard[BATTING_STANDARD_VALUES]
 
     master = pd.merge(advanced, standard, how='outer', on=['Name'])
-    master = master[batting_master_values()]
+    master = master[BATTING_MASTER_VALUES]
     master = master.set_index(['Name'])
 
-    print("Category Options (" + " ".join(batting_category_options()) + "):")
-    cat1_entry = get_input("First Category: ", batting_category_options())
-    cat2_entry = get_input("Second Category: ", batting_category_options())
+    print("Category Options (" + " ".join(BATTING_CATEGORY_OPTIONS) + "):")
+    cat1_entry = get_input("First Category: ", BATTING_CATEGORY_OPTIONS)
+    cat2_entry = get_input("Second Category: ", BATTING_CATEGORY_OPTIONS)
 
 plot_stats(master,cat1_entry,cat2_entry)
